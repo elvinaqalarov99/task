@@ -43,10 +43,10 @@ class EmployeeTest extends TestCase
         // then authenticate this user
         $this->actingAs($user);
 
-        // fake company data
+        // fake employee data
         $employee = Employee::factory()->create(['company_id'=>1]);
 
-        // hit books route with post request
+        // hit employees route with post request
         $response = $this->post('dashboard/employees',[$employee]);
         // assert we were redirecting to the dashboard/companies page
         $response->assertStatus(200); 

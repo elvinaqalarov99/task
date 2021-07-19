@@ -45,7 +45,7 @@ class CompanyTest extends TestCase
         // fake company data
         $company = Company::factory()->create();
 
-        // hit books route with post request
+        // hit companies route with post request
         $response = $this->post('dashboard/companies',[$company]);
         // assert we were redirecting to the dashboard/companies page
         $response->assertStatus(200);
