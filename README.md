@@ -6,3 +6,8 @@
     <li>Create Database in your sql named 'task'</li>
     <li>php artisan migrate:fresh --seed</li>
 </ul>
+
+<p>To test Controllers, run the following below:</p>
+<ul>
+    <li>php artisan test</li>
+</ul>
