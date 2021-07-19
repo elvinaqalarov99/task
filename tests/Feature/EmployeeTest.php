@@ -49,6 +49,6 @@ class EmployeeTest extends TestCase
         // hit books route with post request
         $response = $this->post('dashboard/employees',[$employee]);
         // assert we were redirecting to the dashboard/companies page
-        $response->assertStatus(200);
+        $response->assertStatus(200); 
     }
 }
