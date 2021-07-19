@@ -1,25 +1,25 @@
 @extends('layouts.app')
 
-@section('title','Companies')
-@section('breadcrumb','Companies')
+@section('title',__("companies.title"))
+@section('breadcrumb',__("companies.title"))
 @section('content')
 <div class="row">
     <div class="col-xl-12">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-end mb-3">
-                    <a class="btn btn-primary" href="{{ route('companies.create') }}">Add</a>
+                    <a class="btn btn-primary" href="{{ route('companies.create') }}">{{ __('default.add') }}</a>
                 </div>
                 <table data-toggle="table" data-pagination="true"
                 data-search="true" class="table table-responsive-sm table-striped table-bordered" style="width:100%">
                     <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">#</th>
-                            <th data-sortable="true" data-field="name">Name</th>
-                            <th data-sortable="true" data-field="email">Email</th>
-                            <th>Logo</th>
-                            <th data-sortable="true" data-field="website">Website</th>
-                            <th>Actions</th>
+                            <th data-sortable="true" data-field="name">{{ __('companies.name') }}</th>
+                            <th data-sortable="true" data-field="email">{{ __('companies.email') }}</th>
+                            <th>{{ __('companies.logo') }}</th>
+                            <th data-sortable="true" data-field="website">{{ __('companies.website') }}</th>
+                            <th>{{ __('companies.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>

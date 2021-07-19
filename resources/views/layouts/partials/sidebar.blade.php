@@ -18,7 +18,7 @@
           <a href="{{ route('logout') }}" class="d-block" role="button"
             onclick="event.preventDefault();
                     document.getElementById('logout-form').submit();">
-            {{ __('Logout') }}
+            {{ __('default.logout') }}
           </a>
           <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf
@@ -35,7 +35,7 @@
             <a href=" {{ route('dashboard') }}" class="nav-link {{ (request()->is('dashboard')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Dashboard
+                {{ __('default.dashboard') }}
               </p>
             </a>
           </li>
@@ -43,7 +43,7 @@
             <a href="#" class="nav-link {{ (request()->is('dashboard/companies*')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-building"></i>
               <p>
-                Companies
+                {{ __('companies.title') }}
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -51,13 +51,13 @@
               <li class="nav-item">
                 <a href="{{ route('companies.index') }}" class="nav-link {{ (request()->is('dashboard/companies')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Companies</p>
+                  <p>{{ __('companies.title') }}</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ route('companies.create') }}" class="nav-link {{ (request()->is('dashboard/companies/create')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Create a Company</p>
+                  <p>{{ __('companies.create') }}</p>
                 </a>
               </li>
             </ul>
@@ -66,7 +66,7 @@
             <a href="#" class="nav-link {{ (request()->is('dashboard/employees*')) ? 'active' : '' }}">
               <i class="nav-icon fas fa-users"></i>
               <p>
-                Employees
+                {{ __('employees.title') }}
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -74,13 +74,13 @@
               <li class="nav-item">
                 <a href="{{ route('employees.index') }}" class="nav-link {{ (request()->is('dashboard/employees')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Employees</p>
+                  <p>{{ __('employees.title') }}</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ route('employees.create') }}" class="nav-link {{ (request()->is('dashboard/employees/create')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Create an Employee</p>
+                  <p>{{ __('employees.create') }}</p>
                 </a>
               </li>
             </ul>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -65,6 +67,13 @@ class CompanyController extends Controller
         $res = $company->save();
 
         if($res){
+            $details = [
+                'title' => 'Mail from Elvin',
+                'body' => 'New Company '. $company->name . ' is created by ' . Auth::user()->name . ' successfully!'
+            ];
+           
+            Mail::to('elvin.aqalarov2@gmail.com')->send(new \App\Mail\NewCompanyMail($details));
+           
             return response()->json(['success'=>200]);
         }else{
             return response()->json(['success'=>400]);
@@ -105,7 +114,8 @@ class CompanyController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'=> 'required|string',
-            'email'=>'sometimes|required|email|unique:companies,email',
+            // add an {id} to edit unique field
+            'email'=>'required|email|unique:companies,email,'.$id,
             'logo'=> 'image|mimes:png,jpg,jpeg|dimensions:min_width=100,min_height=100|max:2048',
             'website'=>'nullable|string'
         ]);

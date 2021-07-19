@@ -28,3 +28,5 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function() {
     Route::resource('companies', CompanyController::class);
     Route::resource('employees', EmployeeController::class);  
 });
+
+Route::get('lang/{lang}',[App\Http\Controllers\LanguageController::class, 'switchLang'])->name('lang.switch');

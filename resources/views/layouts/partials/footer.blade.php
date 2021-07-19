@@ -24,8 +24,6 @@
 <script src=" {{ asset('js/adminlte.js') }}"></script>
 {{-- Select2 --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
 <!-- IntlTelInput -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 {{-- Input mask --}}
@@ -38,7 +36,7 @@
   $(".select2").select2();
 
   function deleteConfirmation(id,model) {
-      swal({
+      swal.fire({
           title: "Delete?",
           text: "Please ensure and then confirm!",
           type: "warning",
@@ -61,9 +59,9 @@
                           setTimeout(function(){
                               location.reload();
                           },1000);
-                          swal("Done!", "", "success");
+                          swal.fire("Done!", "", "success");
                       } else {
-                          swal("Error!", "Something went wrong, please try again later", "error");
+                          swal.fire("Error!", "Something went wrong, please try again later", "error");
                       }
                   }
               });
@@ -111,7 +109,7 @@
           contentType: false,
           data: formData,
           beforeSend: function(){
-              resetErrors(errName);
+              resetErrors(errName + "_err");
               handleButton(1,errName,btnName);
           },
           success: function (res) {
@@ -120,17 +118,17 @@
                   setTimeout(function(){
                       location.href = window.location.origin +`/dashboard/${url.slice(0,url.indexOf('/'))}`;
                   },1000);
-                  swal("Done!", "", "success");
+                  swal.fire("Done!", "", "success");
               }else{
                   $.each(res.errors, function (key, val) {
                       $("#"+ errName + "_" + key + "_err").text(val[0]);
                   });
-                  swal("Error!", 'Please fiil up all the fields', "error");
+                  swal.fire("Error!", 'Please fiil up all the fields', "error");
               }
           },
           error: function (e) {
               handleButton(0,errName,btnName);
-              swal("Error!", 'Something went wrong, please try again later', "error");
+              swal.fire("Error!", 'Something went wrong, please try again later', "error");
           }
       });
   }

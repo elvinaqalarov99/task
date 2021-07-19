@@ -102,8 +102,9 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'firstname'=> 'required|string',
             'lastname'=>'required|string',
-            'email'=>'email|unique:employees,email',
-            'phone'=> 'sometimes|string|unique:employees,phone',
+            // pass an {id} to edit unique field 
+            'email'=>'email|unique:employees,email,'.$id,    
+            'phone'=> 'sometimes|string|unique:employees,phone,'.$id,
             'company'=>'required|integer'
         ]);
 
