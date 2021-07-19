@@ -5,6 +5,7 @@
     <li>npm run dev</li>
     <li>Create Database in your sql named 'task'</li>
     <li>php artisan migrate:fresh --seed</li>
+    <li>php artisan storage:link</li>
 </ul>
 
 <p>To test Controllers, run the following below:</p>
