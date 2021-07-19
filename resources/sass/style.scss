@@ -1,0 +1,28 @@
+.pointer {
+    cursor: pointer;
+}
+
+.select2 {
+    width: 100% !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+    margin-top: 0px !important;
+    line-height: 20px !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 0px !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 37px !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow {
+    top: 5px !important;
+}

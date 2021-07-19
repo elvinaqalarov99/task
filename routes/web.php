@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\EmployeeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
+});
+
+Auth::routes(['register'=>false]);
+
+Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+
+Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function() {
+    Route::resource('companies', CompanyController::class);
+    Route::resource('employees', EmployeeController::class);  
 });
