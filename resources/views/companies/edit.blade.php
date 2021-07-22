@@ -14,7 +14,11 @@
                     <div class="form-group">
                         <label for="company_logo">{{ __('companies.logo') }}</label>
                         <input type="file" class="form-control-file mb-3" id="company_logo" name="logo">
-                        <img class="img-thumbnail" src="{{ asset('storage/'.$company->logo) }}" alt="logo" width="100" height="100" />
+                        @if (isset($company->logo))
+                            <img class="img-thumbnail" src="{{ asset('storage/'.$company->logo) }}" alt="logo" width="100" height="100" />                        
+                        @else
+                            <p class="text-info">{{ __('default.no_logo') }}</p>
+                        @endif
                         <p id="company_logo_err" class="company_err text-danger"></p>
                     </div>
                     <div class="form-group">

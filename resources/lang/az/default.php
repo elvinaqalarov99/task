@@ -16,4 +16,6 @@ return [
     'edit' => 'Redaktə etmək',
     'logout'=>'Çıxış',
     'dashboard'=>'Panel',
+    'add_logo'=>'Şirkət loqosunu əlavə edin',
+    'no_logo'=>'Heç bir logo əlavə edilməyib'
 ];

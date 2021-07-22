@@ -12,6 +12,7 @@
                     <div class="form-group">
                         <label for="company_logo">{{ __('companies.logo') }}</label>
                         <input type="file" class="form-control-file" id="company_logo" name="logo">
+                        <small>{{ __('default.add_logo') }}</small>
                         <p id="company_logo_err" class="company_err text-danger"></p>
                     </div>
                     <div class="form-group">

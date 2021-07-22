@@ -33,145 +33,185 @@
 
 <script>
 
-  $(".select2").select2();
+    $(".select2").select2();
 
-  function deleteConfirmation(id,model) {
-      swal.fire({
-          title: "Delete?",
-          text: "Please ensure and then confirm!",
-          type: "warning",
-          showCancelButton: !0,
-          confirmButtonText: "Yes, delete it!",
-          cancelButtonText: "No, cancel!",
-          reverseButtons: !0
-      }).then(function (e) {
+    function deleteConfirmation(id,model) {
+        swal.fire({
+            title: "Delete?",
+            text: "Please ensure and then confirm!",
+            type: "warning",
+            showCancelButton: !0,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            reverseButtons: !0
+        }).then(function (e) {
 
-          if (e.value === true) {
-              const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+            if (e.value === true) {
+                const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
-              $.ajax({
-                  type: 'POST',
-                  url: `/dashboard/${model}/${id}`,
-                  data: {_token: CSRF_TOKEN,_method:'delete'},
-                  dataType: 'JSON',
-                  success: function (results) {
-                      if (results.success === 200) {
-                          setTimeout(function(){
-                              location.reload();
-                          },1000);
-                          swal.fire("Done!", "", "success");
-                      } else {
-                          swal.fire("Error!", "Something went wrong, please try again later", "error");
-                      }
-                  }
-              });
+                $.ajax({
+                    type: 'POST',
+                    url: `/dashboard/${model}/${id}`,
+                    data: {_token: CSRF_TOKEN,_method:'delete'},
+                    dataType: 'JSON',
+                    success: function (results) {
+                        if (results.success === 200) {
+                            setTimeout(function(){
+                                location.reload();
+                            },1000);
+                            swal.fire("Done!", "", "success");
+                        } else {
+                            swal.fire("Error!", "Something went wrong, please try again later", "error");
+                        }
+                    }
+                });
 
-          } else {
-              e.dismiss;
-          }
+            } else {
+                e.dismiss;
+            }
 
-      }, function (dismiss) {
-          return false;
-      })
-  }
+        }, function (dismiss) {
+            return false;
+        })
+    }
 
 
-  $('#company-submit-form').submit(function(e){
-      e.preventDefault();
-      handleRequest('company-submit-form','companies/','company','Add');
-  });
+    $('#company-submit-form').submit(function(e){
+        e.preventDefault();
+        handleRequest('company-submit-form','companies/','company','Add');
+    });
 
-  $('#company-edit-form').submit(function(e){
-      e.preventDefault();
-      const company_id = $('#company_id').val();
-      handleRequest('company-edit-form','companies/'+company_id,'company','Edit');
-  });
+    $('#company-edit-form').submit(function(e){
+        e.preventDefault();
+        const company_id = $('#company_id').val();
+        handleRequest('company-edit-form','companies/'+company_id,'company','Edit');
+    });
 
-  $('#employee-submit-form').submit(function(e){
-      e.preventDefault();
-      handleRequest('employee-submit-form','employees/','employee','Add');
-  });
+    $('#employee-submit-form').submit(function(e){
+        e.preventDefault();
+        handleRequest('employee-submit-form','employees/','employee','Add');
+    });
 
-  $('#employee-edit-form').submit(function(e){
-      e.preventDefault();
-      const employee_id = $('#employee_id').val();
-      handleRequest('employee-edit-form','employees/'+employee_id,'employee','Edit');
-  });
+    $('#employee-edit-form').submit(function(e){
+        e.preventDefault();
+        const employee_id = $('#employee_id').val();
+        handleRequest('employee-edit-form','employees/'+employee_id,'employee','Edit');
+    });
 
-  function handleRequest(formName,url,errName,btnName){
-      const form = $('#'+formName)[0];
-      const formData = new FormData(form);
-      if(errName === 'employee') formData.append('phone',phoneInput.getNumber());
-      $.ajax({
-          type: "POST",
-          url: '/dashboard/'+url,
-          processData: false,
-          contentType: false,
-          data: formData,
-          beforeSend: function(){
-              resetErrors(errName + "_err");
-              handleButton(1,errName,btnName);
-          },
-          success: function (res) {
-              handleButton(0,errName,btnName);
-              if(res.success == 200){
-                  setTimeout(function(){
-                      location.href = window.location.origin +`/dashboard/${url.slice(0,url.indexOf('/'))}`;
-                  },1000);
-                  swal.fire("Done!", "", "success");
-              }else{
-                  $.each(res.errors, function (key, val) {
-                      $("#"+ errName + "_" + key + "_err").text(val[0]);
-                  });
-                  swal.fire("Error!", 'Please fiil up all the fields', "error");
-              }
-          },
-          error: function (e) {
-              handleButton(0,errName,btnName);
-              swal.fire("Error!", 'Something went wrong, please try again later', "error");
-          }
-      });
-  }
+    function handleRequest(formName,url,errName,btnName){
+        const form = $('#'+formName)[0];
+        const formData = new FormData(form);
+        if(errName === 'employee') formData.append('phone',phoneInput.getNumber());
+        $.ajax({
+            type: "POST",
+            url: '/dashboard/'+url,
+            processData: false,
+            contentType: false,
+            data: formData,
+            beforeSend: function(){
+                resetErrors(errName + "_err");
+                handleButton(1,errName,btnName);
+            },
+            success: function (res) {
+                console.log(res);
+                handleButton(0,errName,btnName);
+                if(res.success == 200){
+                    setTimeout(function(){
+                        location.href = window.location.origin +`/dashboard/${url.slice(0,url.indexOf('/'))}`;
+                    },1000);
+                    swal.fire("Done!", "", "success");
+                }else{
+                    swal.fire("Error!", "Something went wrong, please try again later.", "error");
+                }
+            },
+            error: function (e) {
+                handleButton(0,errName,btnName);
+                $.each(e.responseJSON.errors, function (key, val) {
+                        $("#"+ errName + "_" + key + "_err").text(val[0]);
+                    });
+                swal.fire("Error!", "The given data was invalid.", "error");
+            }
+        });
+    }
 
-  function resetErrors(name){
-      const errors = document.getElementsByClassName(name);
-      for (i = 0; i < errors.length; i++) {
-          errors[i].innerHTML = "";
-      }
-  }
+    function resetErrors(name){
+        const errors = document.getElementsByClassName(name);
+        for (i = 0; i < errors.length; i++) {
+            errors[i].innerHTML = "";
+        }
+    }
   
-  function handleButton(type,model,name){
-      if(type){
-          $('#' + model + '-submit-btn').prop('disabled',true);
-          $('#' + model + '-submit-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Loading...</span>');
-      }else{
-          $('#' + model + '-submit-btn').prop('disabled',false);
-          $('#' + model + '-submit-btn').html(name);   
-      }
-  }
+    function handleButton(type,model,name){
+        if(type){
+            $('#' + model + '-submit-btn').prop('disabled',true);
+            $('#' + model + '-submit-btn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Loading...</span>');
+        }else{
+            $('#' + model + '-submit-btn').prop('disabled',false);
+            $('#' + model + '-submit-btn').html(name);   
+        }
+    }
+
+    function removeLastSlash (myUrl){
+        if (myUrl.substring(myUrl.length-1) == "/"){
+            myUrl = myUrl.substring(0, myUrl.length-1);
+        }
+        return myUrl;
+    }
+
+    function ajaxRequest(params) {
+        const url = removeLastSlash(window.location.href);
+        const model = url.substring(url.lastIndexOf('/')+1);
+
+        $.ajax({
+            type: "GET",
+            url: url + "/data" + '?' + $.param(params.data),
+            dataType: "json",
+            success: function(data) {
+                const newData = data?.rows?.map((item)=>{
+                    const itemData = item;
+                    if( model == "companies" && itemData?.logo !=undefined && itemData?.logo != null ){
+                        itemData.logo = `<img src="{{ asset('storage/${itemData?.logo}') }}" class="img-thumbnail" width="50" height="50" alt="${model}" />`;
+                    }
+                    itemData.actions = `<a href="/dashboard/${model}/${item.id}/edit" style="margin-right:7px"><i class="fa fa-edit text-primary"></i></a><button class="btn p-0" type="submit" onclick="deleteConfirmation('${item.id}','${model}')"> <i style="font-size: 18px;color:red" class="fa fa-times"></i></button>`;
+                    return itemData;
+                });
+            
+            params.success({
+                "rows": newData,
+                "total": data.total,
+                'totalNotFiltered': data.totalNotFiltered
+            })
+            },
+            error: function(er) {
+                params.error(er);
+            }
+        });
+    }
+
+    
 </script>
 
 <script>
 
-function getIp(callback) {
-    fetch("https://ipinfo.io/json?token=85a16d6fbd959b")
-        .then((resp) => resp.json())
-        .catch(() => {
-            return {
-                country: "az",
-            };
-        })
-        .then((resp) => callback(resp.country));
-  }
+    function getIp(callback) {
+        fetch("https://ipinfo.io/json?token=85a16d6fbd959b")
+            .then((resp) => resp.json())
+            .catch(() => {
+                return {
+                    country: "az",
+                };
+            })
+            .then((resp) => callback(resp.country));
+    }
 
-  const phoneInputField = document.getElementById("employee_phone");
-  const phoneInput = window.intlTelInput(phoneInputField, {
-    initialCountry: "auto",
-    separateDialCode: true,
-    preferredCountries: ['az','tr','us','ru'],
-    geoIpLookup: getIp,
-    utilsScript:
-        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-  });
+    const phoneInputField = document.getElementById("employee_phone");
+    const phoneInput = window.intlTelInput(phoneInputField, {
+        initialCountry: "auto",
+        separateDialCode: true,
+        preferredCountries: ['az','tr','us','ru'],
+        geoIpLookup: getIp,
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
 
 </script>

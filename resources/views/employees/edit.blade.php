@@ -36,7 +36,7 @@
                         <select class="form-control select2" name="company" id="employee_company">
                             <option value="" selected disabled>{{ __('default.select') }}</option>
                             @foreach ($companies as $company)
-                                @if ($company->id === $employee->company->id)
+                                @if ( $company->id === optional($employee->company)->id)
                                     <option selected value="{{ $company->id }}">{{ $company->name }}</option>
                                 @else
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>

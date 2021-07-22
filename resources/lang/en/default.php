@@ -16,4 +16,6 @@ return [
     'edit' => 'Edit',
     'logout'=>'Logout',
     'dashboard'=>'Dashboard',
+    'add_logo'=>'Add company logo',
+    'no_logo'=>'No logo added'
 ];

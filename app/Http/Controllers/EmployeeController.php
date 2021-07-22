@@ -2,13 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmployeeStoreRequest;
+use App\Http\Requests\EmployeeUpdateRequest;
 use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
+
+    /**
+     * Display a listing of the resource for table.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function allData(Request $request)
+    {
+        if( isset($request->sort)){
+            $employees = Employee::orderBy($request->sort,$request->order);
+        }else{
+            $employees = Employee::orderBy('id','asc');            
+        }
+
+        if( isset($request->search)){
+            $employees
+                ->where('firstname','LIKE',"%$request->search%")
+                ->orWhere('lastname','LIKE',"%$request->search%")
+                ->orWhere('email','LIKE',"%$request->search%")
+                ->orWhere('phone','LIKE',"%$request->search%");
+                
+            $count = $employees->count();
+        }else{
+            $count = Employee::count();           
+        }
+
+        $employees
+        ->skip($request->offset)
+        ->take($request->limit);
+        
+        return response()->json([
+            'total'=>$count,
+            'totalNotFiltered'=>Employee::count(),
+            'rows'=> $employees->get(),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -37,26 +75,15 @@ class EmployeeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EmployeeStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'firstname'=> 'required|string',
-            'lastname'=>'required|string',
-            'email'=>'required|email|unique:employees,email',
-            'phone'=> 'nullable|string|unique:employees,phone',
-            'company'=>'nullable|integer'
-        ]);
-
-        if ($validator->fails()){
-            return response()->json(['success'=>400,'errors'=>$validator->errors()]);
-        }
-        
+        $validated = $request->validated();
         $employee = new Employee();
-        $employee->firstname = $request->firstname;
-        $employee->lastname = $request->lastname;
-        $employee->phone = $request->phone;
-        $employee->email = $request->email;
-        $employee->company_id = $request->company;
+        $employee->firstname = $validated['firstname'];
+        $employee->lastname = $validated['lastname'];
+        $employee->phone = $validated['phone'];
+        $employee->email = $validated['email'];
+        $employee->company_id = isset($validated['company']) ? $validated['company'] : null;
         $res = $employee->save();
 
         if($res){
@@ -83,9 +110,8 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Employee $employee)
     {
-        $employee = Employee::find($id);
         $companies = Company::orderBy('id','desc')->get();
         return view('employees.edit',compact('employee','companies'));
     }
@@ -97,27 +123,15 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EmployeeUpdateRequest $request, Employee $employee)
     {
-        $validator = Validator::make($request->all(), [
-            'firstname'=> 'required|string',
-            'lastname'=>'required|string',
-            // pass an {id} to edit unique field 
-            'email'=>'email|unique:employees,email,'.$id,    
-            'phone'=> 'sometimes|string|unique:employees,phone,'.$id,
-            'company'=>'required|integer'
-        ]);
+        $validated = $request->validated();
 
-        if ($validator->fails()){
-            return response()->json(['success'=>400,'errors'=>$validator->errors()]);
-        }
-        
-        $employee = Employee::find($id);
-        $employee->firstname = $request->firstname;
-        $employee->lastname = $request->lastname;
-        $employee->phone = $request->phone;
-        $employee->email = $request->email;
-        $employee->company_id = $request->company;
+        $employee->firstname = $validated['firstname'];
+        $employee->lastname = $validated['lastname'];
+        $employee->phone = $validated['phone'];
+        $employee->email = $validated['email'];
+        $employee->company_id = isset($validated['company']) ? $validated['company'] : null;
         $res = $employee->save();
 
         if($res){
@@ -133,10 +147,8 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $employee = Employee::find($id);
-        
+    public function destroy(Employee $employee)
+    {        
         $res = $employee->delete();
         
         if($res){

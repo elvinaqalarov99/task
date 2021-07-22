@@ -2,15 +2,53 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendMail;
+use App\Http\Requests\CompanyStoreRequest;
+use App\Http\Requests\CompanyUpdateRequest;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class CompanyController extends Controller
 {
+
+    /**
+     * Display a listing of the resource for table.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function allData(Request $request)
+    {
+        
+
+        if(isset($request->sort)){
+            $companies = Company::orderBy($request->sort,$request->order);
+        }else{
+            $companies = Company::orderBy('id','asc');            
+        }
+
+        if(isset($request->search)){
+            $companies
+                ->where('name','LIKE',"%$request->search%")
+                ->orWhere('email','LIKE',"%$request->search%")
+                ->orWhere('website','LIKE',"%$request->search%");
+                
+            $count = $companies->count();
+        }else{
+            $count = Company::count();           
+        }
+
+        $companies
+        ->skip($request->offset)
+        ->take($request->limit);
+        
+        return response()->json([
+            'total'=>$count,
+            'totalNotFiltered'=>Company::count(),
+            'rows'=> $companies->get(),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,8 +56,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::orderBy('id','desc')->get();
-        return view('companies.index')->with('companies',$companies);
+        return view('companies.index');
     }
 
     /**
@@ -39,31 +76,21 @@ class CompanyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CompanyStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name'=> 'required|string',
-            'email'=>'required|email|unique:companies,email',
-            'logo'=> 'image|mimes:png,jpg,jpeg|dimensions:min_width=100,min_height=100|max:2048',
-            'website'=>'nullable|string'
-        ]);
+        $validated = $request->validated();
 
-        if ($validator->fails()){
-            return response()->json(['success'=>400,'errors'=>$validator->errors()]);
+        $logoName = isset($validated['logo']) ? time() . '.' . $validated['logo']->extension() : null;
+
+        if(isset($validated['logo'])){
+            $validated['logo']->storeAs('public', $logoName);
         }
         
         $company = new Company();
-
-        $logoName = $request->hasFile('logo') ? time() . '.' . $request->logo->extension() : '';
-
-        if($request->hasFile('logo')){
-            $request->logo->storeAs('public', $logoName);
-        }
-        
-        $company->name = $request->name;
-        $company->email = $request->email;
+        $company->name = $validated['name'];
+        $company->email = $validated['email'];
         $company->logo = $logoName;
-        $company->website = $request->website;
+        $company->website = isset($validated['website']) ? $validated['website'] : null;
         $res = $company->save();
 
         if($res){
@@ -72,8 +99,8 @@ class CompanyController extends Controller
                 'body' => 'New Company '. $company->name . ' is created by ' . Auth::user()->name . ' successfully!'
             ];
            
-            Mail::to('elvin.aqalarov2@gmail.com')->send(new \App\Mail\NewCompanyMail($details));
-           
+            SendMail::dispatch($details);
+            
             return response()->json(['success'=>200]);
         }else{
             return response()->json(['success'=>400]);
@@ -97,9 +124,8 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Company $company)
     {
-        $company = Company::find($id);
         return view('companies.edit')->with('company',$company);
     }
 
@@ -110,32 +136,21 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CompanyUpdateRequest $request,Company $company)
     {
-        $validator = Validator::make($request->all(), [
-            'name'=> 'required|string',
-            // add an {id} to edit unique field
-            'email'=>'required|email|unique:companies,email,'.$id,
-            'logo'=> 'image|mimes:png,jpg,jpeg|dimensions:min_width=100,min_height=100|max:2048',
-            'website'=>'nullable|string'
-        ]);
+        
+        $validated = $request->validated();
 
-        if ($validator->fails()){
-            return response()->json(['success'=>400,'errors'=>$validator->errors()]);
+        $logoName = isset($validated['logo']) ? time() . '.' . $validated['logo']->extension() : null;
+
+        if(isset($validated['logo'])){
+            $validated['logo']->storeAs('public', $logoName);
         }
         
-        $company = Company::find($id);
-
-        $logoName = $request->hasFile('logo') ? time() . '.' . $request->logo->extension() : $company->logo;
-
-        if($request->hasFile('logo')){
-            $request->logo->storeAs('public', $logoName);
-        }
-        
-        $company->name = $request->name;
-        $company->email = $request->email;
+        $company->name = $validated['name'];
+        $company->email = $validated['email'];
         $company->logo = $logoName;
-        $company->website = $request->website;
+        $company->website = isset($validated['website']) ? $validated['website'] : null;
         $res = $company->save();
 
         if($res){
@@ -151,10 +166,8 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $company = Company::find($id);
-        
+    public function destroy(Company $company)
+    {        
         $res = $company->delete();
         
         if($res){
