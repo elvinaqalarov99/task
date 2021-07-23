@@ -7,7 +7,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
-class SendMailFired
+
+// Adding ShouldQueue interface, makes it queued for slow operations
+class SendMailFired implements ShouldQueue
 {
     /**
      * Create the event listener.

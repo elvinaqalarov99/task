@@ -8,6 +8,11 @@
     <li>php artisan storage:link</li>
 </ul>
 
+<p>To run queued event listeners, run the following below:</p>
+<ul>
+    <li>php artisan queue:listen database</li>
+</ul>
+
 <p>To test Controllers, run the following below:</p>
 <ul>
     <li>php artisan test</li>
